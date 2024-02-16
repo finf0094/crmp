@@ -1,0 +1,52 @@
+{
+  "name": "mikosh-launcher",
+  "author": "MIKOSH SBORKA",
+  "description": "Лаунчер Mikosh Launcher от MIKOSH SBORKA",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build",
+    "lint": "vue-cli-service lint",
+    "electron:build": "vue-cli-service electron:build",
+    "start": "vue-cli-service electron:serve",
+    "electron:publish": "vue-cli-service electron:build -p always",
+    "postinstall": "electron-builder install-app-deps",
+    "postuninstall": "electron-builder install-app-deps"
+  },
+  "dependencies": {
+    "adm-zip": "^0.5.10",
+    "axios": "^1.6.7",
+    "crypto-js": "^4.1.1",
+    "download": "^8.0.0",
+    "electron-log": "^5.0.0-beta.16",
+    "electron-updater": "^5.3.0",
+    "marked": "^4.3.0",
+    "md5-file": "^5.0.0",
+    "motion": "^10.17.0",
+    "nanoid": "^4.0.2",
+    "octokit": "^2.0.14",
+    "open": "^8.4.1",
+    "primeflex": "^3.3.1",
+    "primeicons": "^6.0.1",
+    "primevue": "^3.47.2",
+    "stat-mode": "^1.0.0",
+    "user-agents": "^1.1.55",
+    "vue": "^3.2.13",
+    "vuex": "^4.0.0",
+    "ws": "^8.13.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.12.16",
+    "@vue/cli-plugin-babel": "~5.0.0",
+    "@vue/cli-plugin-vuex": "~5.0.0",
+    "@vue/cli-service": "~5.0.0",
+    "electron": "16.2.8",
+    "electron-devtools-installer": "^3.1.0",
+    "javascript-obfuscator": "^4.0.2",
+    "sass": "^1.32.7",
+    "sass-loader": "^13.2.0",
+    "vue-cli-plugin-electron-builder": "^3.0.0-alpha.4",
+    "webpack-obfuscator": "^3.5.1"
+  }
+}
