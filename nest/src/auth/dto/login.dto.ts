@@ -9,7 +9,7 @@ export class LoginDto {
     sid?: string;
 
     @IsString()
-    @MinLength(6)
+    @MinLength(8)
     @IsNotEmpty()
     password: string;
 }

@@ -43,16 +43,19 @@ export class AuthService {
         if (user || user.username === dto.username) {
             throw new ConflictException('Пользователь с таким email уже зарегистрирован');
         }
+        const savedUser = this.userService.save(dto).catch((err) => {
+            this.logger.error(err);
+            return null;
+        });
+
         if (dto.sid && !user.sid) {
             await this.prismaService.user.update({
                 where: { id: user.id },
                 data: { sid: dto.sid },
             });
         }
-        return this.userService.save(dto).catch((err) => {
-            this.logger.error(err);
-            return null;
-        });
+
+        return savedUser;
     }
 
     async login(dto: LoginDto, agent: string): Promise<Tokens> {
@@ -133,7 +136,7 @@ export class AuthService {
         });
         if (!user) {
             throw new HttpException(
-                `Не получилось создать пользователя с email ${email} в Google auth`,
+                `Не получилось создать пользователя с email ${email} в ${provider} auth`,
                 HttpStatus.BAD_REQUEST,
             );
         }

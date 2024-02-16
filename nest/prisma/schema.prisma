@@ -44,7 +44,7 @@ enum Role {
 
 enum Provider {
   GOOGLE
-  YANDEX
+  VKONTAKTE
 }
 
 model Product {

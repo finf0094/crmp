@@ -24,8 +24,8 @@ import { LoginDto, RegisterDto } from './dto';
 import { GoogleGuard } from './guargs/google.guard';
 import { Tokens } from './interfaces';
 import { handleTimeoutAndErrors } from '@common/helpers';
-import { YandexGuard } from './guargs/yandex.guard';
 import { Provider } from '@prisma/client';
+import { VkontakteGuard } from './guargs/vkontakte.guard';
 
 const REFRESH_TOKEN = 'refreshtoken';
 
@@ -116,27 +116,27 @@ export class AuthController {
         );
     }
 
-    @UseGuards(YandexGuard)
-    @Get('yandex')
+    @UseGuards(VkontakteGuard)
+    @Get('vkontakte')
     // eslint-disable-next-line @typescript-eslint/no-empty-function
-    yandexAuth() {}
+    vkontakteAuth() {}
 
-    @UseGuards(YandexGuard)
-    @Get('yandex/callback')
-    yandexAuthCallback(@Req() req: Request, @Res() res: Response) {
+    @UseGuards(VkontakteGuard)
+    @Get('vkontakte/callback')
+    vkontakteAuthCallback(@Req() req: Request, @Res() res: Response) {
         const token = req.user['accessToken'];
-        return res.redirect(`http://localhost:3000/api/auth/success-yandex?token=${token}`);
+        return res.redirect(`http://localhost:3000/api/auth/success-google?token=${token}`);
     }
 
-    @Get('success-yandex')
+    @Get('success-vkontakte')
     // eslint-disable-next-line @typescript-eslint/no-empty-function
-    successYandex(@Query('token') token: string, @UserAgent() agent: string, @Res() res: Response) {
-        return this.httpService.get(`https://login.yandex.ru/info?format=json&oauth_token=${token}`).pipe(
-            mergeMap(({ data: { default_email } }) =>
-                this.authService.providerAuth(default_email, agent, Provider.YANDEX),
-            ),
-            map((data) => this.sendTokens(data, res)),
-            handleTimeoutAndErrors(),
-        );
+    successVkontakte(@Query('token') token: string, @UserAgent() agent: string, @Res() res: Response) {
+        return this.httpService
+            .get(`https://api.vk.com/method/users.get?fields=email&access_token=${token}&v=5.131`)
+            .pipe(
+                mergeMap(({ data: { email } }) => this.authService.providerAuth(email, agent, Provider.VKONTAKTE)),
+                map((data) => this.sendTokens(data, res)),
+                handleTimeoutAndErrors(),
+            );
     }
 }

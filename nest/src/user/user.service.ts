@@ -30,6 +30,7 @@ export class UserService {
             },
             create: {
                 email: user.email,
+                username: user.username,
                 password: hashedPassword,
                 provider: user?.provider,
                 roles: ['USER'],
@@ -40,21 +41,21 @@ export class UserService {
         return savedUser;
     }
 
-    async findOne(idOrEmail: string, isReset = false): Promise<User> {
+    async findOne(idOrUsername: string, isReset = false): Promise<User> {
         if (isReset) {
-            await this.cacheManager.del(idOrEmail);
+            await this.cacheManager.del(idOrUsername);
         }
-        const user = await this.cacheManager.get<User>(idOrEmail);
+        const user = await this.cacheManager.get<User>(idOrUsername);
         if (!user) {
             const user = await this.prismaService.user.findFirst({
                 where: {
-                    OR: [{ id: idOrEmail }, { email: idOrEmail }],
+                    OR: [{ id: idOrUsername }, { username: idOrUsername }],
                 },
             });
             if (!user) {
                 return null;
             }
-            await this.cacheManager.set(idOrEmail, user, convertToSecondsUtil(this.configService.get('JWT_EXP')));
+            await this.cacheManager.set(idOrUsername, user, convertToSecondsUtil(this.configService.get('JWT_EXP')));
             return user;
         }
         return user;

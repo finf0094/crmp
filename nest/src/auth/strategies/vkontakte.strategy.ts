@@ -1,15 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
-import { Strategy } from 'passport-yandex';
+import { Strategy } from 'passport-vkontakte';
 
 @Injectable()
-export class YandexStrategy extends PassportStrategy(Strategy, 'yandex') {
+export class VkontakteStrategy extends PassportStrategy(Strategy, 'vkontakte') {
     constructor(private readonly configService: ConfigService) {
         super({
-            clientID: configService.get('YANDEX_APP_ID'), // Замените на свой APP_ID
-            clientSecret: configService.get('YANDEX_APP_SECRET'), // Замените на свой APP_SECRET
-            callbackURL: 'http://localhost:3000/api/auth/yandex/callback', // Замените на свой callback URL
+            clientID: configService.get('VKONTAKTE_APP_ID'), // Замените на свой APP_ID
+            clientSecret: configService.get('VKONTAKTE_APP_SECRET'), // Замените на свой APP_SECRET
+            callbackURL: 'http://localhost:3000/api/auth/vkontakte/callback', // Замените на свой callback URL
         });
     }
 
