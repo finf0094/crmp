@@ -1,5 +1,5 @@
 import { GoogleStrategy } from './google.strategy';
 import { JwtStrategy } from './jwt.strategy';
-import { YandexStrategy } from './yandex.strategy';
+import { VkontakteStrategy } from './vkontakte.strategy';
 
-export const STRTAGIES = [JwtStrategy, GoogleStrategy, YandexStrategy];
+export const STRTAGIES = [JwtStrategy, GoogleStrategy, VkontakteStrategy];

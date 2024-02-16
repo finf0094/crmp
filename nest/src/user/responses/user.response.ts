@@ -20,7 +20,12 @@ export class UserResponse implements User {
     updatedAt: Date;
     roles: Role[];
 
+    @Exclude()
+    sid: string;
+    boughtProducts: string[];
+
     constructor(user: User) {
         Object.assign(this, user);
     }
+    username: string;
 }
