@@ -4,6 +4,9 @@ import { Exclude } from 'class-transformer';
 export class UserResponse implements User {
     id: string;
     email: string;
+    username: string;
+    updatedAt: Date;
+    roles: Role[];
 
     @Exclude()
     password: string;
@@ -17,9 +20,6 @@ export class UserResponse implements User {
     @Exclude()
     isBlocked: boolean;
 
-    updatedAt: Date;
-    roles: Role[];
-
     @Exclude()
     sid: string;
     boughtProducts: string[];
@@ -27,5 +27,4 @@ export class UserResponse implements User {
     constructor(user: User) {
         Object.assign(this, user);
     }
-    username: string;
 }

@@ -48,16 +48,24 @@ enum Provider {
 }
 
 model Product {
-  id         String  @id @default(uuid())
-  productId  String  @unique @map("product_id")
-  name       String
-  isFree     Boolean @map("is_free")
-  isPrivate  Boolean @map("is_private")
-  previewUrl String  @map("preview_url")
-  productUrl String  @map("product_url")
-  pathId     String  @map("path_id")
-  paths      Path    @relation(fields: [pathId], references: [id])
-  price      Float
+  id          String       @id @unique @default(uuid())
+  name        String
+  isFree      Boolean
+  isPrivate   Boolean
+  storeUrl    String
+  libraryUrl  String
+  productUrl  String
+  description String
+  reviews     Review[]
+  price       Float
+  createdAt   DateTime     @default(now())
+  downloads   Int          @default(0)
+  purchased   Int          @default(0)
+  rating      Float        @default(0)
+  discount    Float?
+  screenshots Screenshot[]
+  paths       Path?        @relation(fields: [pathId], references: [id])
+  pathId      String?
 
   @@map("products")
 }
@@ -70,4 +78,25 @@ model Path {
   Product Product[]
 
   @@map("paths")
+}
+
+model Screenshot {
+  id        String  @id @default(uuid())
+  name      String
+  url       String
+  productId String
+  Product   Product @relation(fields: [productId], references: [id])
+
+  @@map("screenshots")
+}
+
+model Review {
+  id        String   @id @default(uuid())
+  username  String
+  createdAt DateTime @default(now())
+  message   String
+  productId String
+  Product   Product  @relation(fields: [productId], references: [id])
+
+  @@map("reviews")
 }
