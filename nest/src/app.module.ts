@@ -6,9 +6,17 @@ import { AuthModule } from './auth/auth.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { UserModule } from './user/user.module';
 import { ProductsModule } from './products/products.module';
+import { PluginsModule } from './plugins/plugins.module';
 
 @Module({
-    imports: [UserModule, PrismaModule, AuthModule, ConfigModule.forRoot({ isGlobal: true }), ProductsModule],
+    imports: [
+        UserModule,
+        PrismaModule,
+        AuthModule,
+        ConfigModule.forRoot({ isGlobal: true }),
+        ProductsModule,
+        PluginsModule,
+    ],
     providers: [
         {
             provide: APP_GUARD,

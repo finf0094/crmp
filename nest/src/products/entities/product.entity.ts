@@ -1,4 +1,4 @@
-import { Path, Product } from '@prisma/client';
+import { Product } from '@prisma/client';
 
 export class ProductEntity implements Product {
     id: string;

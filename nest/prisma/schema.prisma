@@ -66,6 +66,7 @@ model Product {
   screenshots Screenshot[]
   paths       Path?        @relation(fields: [pathId], references: [id])
   pathId      String?
+  Plugin      Plugin[]
 
   @@map("products")
 }
@@ -99,4 +100,27 @@ model Review {
   Product   Product  @relation(fields: [productId], references: [id])
 
   @@map("reviews")
+}
+
+model Plugin {
+  id        String   @id @default(uuid())
+  name      String
+  isPrivate Boolean
+  cloudPath String
+  Product   Product? @relation(fields: [productId], references: [id])
+  productId String?
+  files     File[]
+
+  @@map("plugins")
+}
+
+model File {
+  id        String  @id @default(uuid())
+  path      String
+  hash      String
+  checkHash Boolean
+  Plugin    Plugin? @relation(fields: [pluginId], references: [id])
+  pluginId  String?
+
+  @@map("files")
 }
