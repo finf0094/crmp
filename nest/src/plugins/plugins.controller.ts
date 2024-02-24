@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseUUIDPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { PluginsService } from './plugins.service';
 import { CreatePluginDto } from './dto/create-plugin.dto';
 import { UpdatePluginDto } from './dto/update-plugin.dto';
