@@ -52,9 +52,9 @@ model Product {
   name        String
   isFree      Boolean
   isPrivate   Boolean
-  storeUrl    String
-  libraryUrl  String
-  productUrl  String
+  storeUrl    String?
+  libraryUrl  String?
+  productUrl  String?
   description String
   reviews     Review[]
   price       Float

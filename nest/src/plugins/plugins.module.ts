@@ -3,7 +3,7 @@ import { PluginsService } from './plugins.service';
 import { PluginsController } from './plugins.controller';
 
 @Module({
-  controllers: [PluginsController],
-  providers: [PluginsService],
+    controllers: [PluginsController],
+    providers: [PluginsService],
 })
 export class PluginsModule {}

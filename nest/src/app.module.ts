@@ -7,6 +7,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { UserModule } from './user/user.module';
 import { ProductsModule } from './products/products.module';
 import { PluginsModule } from './plugins/plugins.module';
+import { S3Module } from './s3/s3.module';
 
 @Module({
     imports: [
@@ -16,6 +17,7 @@ import { PluginsModule } from './plugins/plugins.module';
         ConfigModule.forRoot({ isGlobal: true }),
         ProductsModule,
         PluginsModule,
+        S3Module,
     ],
     providers: [
         {

@@ -1,36 +1,31 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { ProductEntity } from './entities/product.entity';
 import { PrismaService } from '@prisma/prisma.service';
+import { S3Service } from '@s3/s3.service';
 
 @Injectable()
 export class ProductsService {
-    constructor(private readonly prismaService: PrismaService) {}
+    constructor(private readonly prismaService: PrismaService, private readonly s3Service: S3Service) {}
 
     async create(dto: CreateProductDto): Promise<ProductEntity> {
-        const { name, isFree, isPrivate, previewUrl, productUrl, price, paths, storeUrl, libraryUrl, description } =
-            dto;
+        const { name, isFree, isPrivate, price, paths, description } = dto;
 
         const data = {
             name,
             isFree,
             isPrivate,
-            previewUrl,
-            productUrl,
             price,
-            storeUrl,
-            libraryUrl,
             description,
             paths: { create: paths },
         };
 
         const createdProduct = await this.prismaService.product.create({
             data,
-            include: { paths: true }, // Включение связанных путей в результат
+            include: { paths: true },
         });
 
-        // Преобразование созданного продукта в экземпляр ProductEntity
         return new ProductEntity(createdProduct);
     }
 
@@ -53,33 +48,14 @@ export class ProductsService {
     }
 
     async update(id: string, dto: UpdateProductDto): Promise<ProductEntity> {
-        const {
-            name,
-            isFree,
-            isPrivate,
-            previewUrl,
-            productUrl,
-            price,
-            storeUrl,
-            libraryUrl,
-            description,
-            paths, // Теперь это одиночный объект, а не массив
-            screenshots,
-            reviews,
-        } = dto;
+        const { name, isFree, isPrivate, price, description, paths, screenshots, reviews } = dto;
 
-        // Подготовка объекта данных для обновления, включая только поля, которые не undefined
         const updateData: any = {
             ...(name !== undefined && { name }),
             ...(isFree !== undefined && { isFree }),
             ...(isPrivate !== undefined && { isPrivate }),
-            ...(previewUrl !== undefined && { previewUrl }),
-            ...(productUrl !== undefined && { productUrl }),
             ...(price !== undefined && { price }),
-            ...(storeUrl !== undefined && { storeUrl }),
-            ...(libraryUrl !== undefined && { libraryUrl }),
             ...(description !== undefined && { description }),
-            // Обновление связанного пути, если он предоставлен
             ...(paths && {
                 paths: {
                     update: {
@@ -92,7 +68,6 @@ export class ProductsService {
                     },
                 },
             }),
-            // Для screenshots и reviews логика остается прежней
             ...(screenshots && {
                 screenshots: {
                     updateMany: screenshots.map((screenshot) => ({
@@ -130,5 +105,71 @@ export class ProductsService {
         await this.prismaService.product.delete({
             where: { id },
         });
+    }
+
+    async uploadProductFile(
+        dataBuffer: Buffer,
+        filename: string,
+        productId: string,
+        fileType: 'screenshot' | 'store' | 'library',
+    ): Promise<void> {
+        const uploadResult = await this.s3Service.uploadPublicFile(dataBuffer, filename);
+
+        if (fileType === 'screenshot') {
+            await this.prismaService.screenshot.create({
+                data: {
+                    name: filename,
+                    url: uploadResult.Location,
+                    productId,
+                },
+            });
+        } else if (fileType === 'store' || fileType === 'library') {
+            await this.prismaService.product.update({
+                where: { id: productId },
+                data: {
+                    ...(fileType === 'store' && { storeUrl: uploadResult.Location }),
+                    ...(fileType === 'library' && { libraryUrl: uploadResult.Location }),
+                },
+            });
+        }
+    }
+
+    async downloadProductFile(
+        productId: string,
+        fileType: 'screenshot' | 'store' | 'library',
+    ): Promise<{ data: Buffer; contentType: string }> {
+        const product = await this.prismaService.product.findUnique({
+            where: { id: productId },
+        });
+
+        if (!product) {
+            throw new NotFoundException('Product not found');
+        }
+
+        let fileKey = '';
+        if (fileType === 'screenshot') {
+            const screenshot = await this.prismaService.screenshot.findFirst({
+                where: { productId: productId },
+            });
+            if (!screenshot) {
+                throw new NotFoundException('Screenshot not found');
+            }
+            fileKey = screenshot.url;
+        } else if (fileType === 'store') {
+            if (!product.storeUrl) {
+                throw new NotFoundException('Store file not found');
+            }
+            fileKey = product.storeUrl;
+        } else if (fileType === 'library') {
+            if (!product.libraryUrl) {
+                throw new NotFoundException('Library file not found');
+            }
+            fileKey = product.libraryUrl;
+        }
+
+        const data = await this.s3Service.downloadPublicFile(fileKey);
+        const contentType = 'application/octet-stream';
+
+        return { data, contentType };
     }
 }

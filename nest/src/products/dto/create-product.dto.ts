@@ -66,18 +66,6 @@ export class CreateProductDto {
     @IsBoolean()
     isPrivate: boolean;
 
-    @IsUrl()
-    previewUrl: string;
-
-    @IsUrl()
-    productUrl: string;
-
-    @IsUrl()
-    storeUrl: string;
-
-    @IsUrl()
-    libraryUrl: string;
-
     @IsNumber()
     price: number;
 

@@ -22,7 +22,8 @@
             "@user/*": ["src/user/*"],
             "@common/*": ["libs/common/src/*"],
             "@auth/*": ["src/auth/*"],
-            "@products/*": ["src/products/*"]
+            "@products/*": ["src/plugins/*"],
+            "@s3/*": ["src/s3/*"]
         }
     }
 }
