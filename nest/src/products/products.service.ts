@@ -4,10 +4,15 @@ import { UpdateProductDto } from './dto/update-product.dto';
 import { ProductEntity } from './entities/product.entity';
 import { PrismaService } from '@prisma/prisma.service';
 import { S3Service } from '@s3/s3.service';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class ProductsService {
-    constructor(private readonly prismaService: PrismaService, private readonly s3Service: S3Service) {}
+    constructor(
+        private readonly prismaService: PrismaService,
+        private readonly s3Service: S3Service,
+        private readonly configService: ConfigService,
+    ) {}
 
     async create(dto: CreateProductDto): Promise<ProductEntity> {
         const { name, isFree, isPrivate, price, paths, description } = dto;
@@ -113,13 +118,19 @@ export class ProductsService {
         productId: string,
         fileType: 'screenshot' | 'store' | 'library',
     ): Promise<void> {
-        const uploadResult = await this.s3Service.uploadPublicFile(dataBuffer, filename);
+        const { Key } = await this.s3Service.uploadPublicFile(dataBuffer, filename);
+
+        // Construct the URL from the Key
+        // Note: Adjust the URL pattern if necessary for your S3 setup
+        const fileUrl = `https://${this.configService.get<string>(
+            'AWS_BUCKET_NAME',
+        )}.s3.${this.configService.get<string>('AWS_REGION')}.amazonaws.com/${Key}`;
 
         if (fileType === 'screenshot') {
             await this.prismaService.screenshot.create({
                 data: {
                     name: filename,
-                    url: uploadResult.Location,
+                    url: fileUrl,
                     productId,
                 },
             });
@@ -127,8 +138,8 @@ export class ProductsService {
             await this.prismaService.product.update({
                 where: { id: productId },
                 data: {
-                    ...(fileType === 'store' && { storeUrl: uploadResult.Location }),
-                    ...(fileType === 'library' && { libraryUrl: uploadResult.Location }),
+                    ...(fileType === 'store' && { storeUrl: fileUrl }),
+                    ...(fileType === 'library' && { libraryUrl: fileUrl }),
                 },
             });
         }
